@@ -13,7 +13,7 @@ import de.hsbremen.tc.tnc.attribute.TncAttributeType;
 import de.hsbremen.tc.tnc.connection.DefaultTncConnectionStateEnum;
 import de.hsbremen.tc.tnc.exception.TncException;
 import de.hsbremen.tc.tnc.im.adapter.GlobalHandshakeRetryListener;
-import de.hsbremen.tc.tnc.im.adapter.tnccs.TnccAdapter;
+import de.hsbremen.tc.tnc.im.adapter.tnccs.TncsAdapter;
 import de.hsbremen.tc.tnc.im.evaluate.example.os.exception.PatternNotFoundException;
 import de.hsbremen.tc.tnc.im.session.ImSessionContext;
 import de.hsbremen.tc.tnc.message.exception.ValidationException;
@@ -60,9 +60,9 @@ public class Dummy extends AbstractDummy{
 		
 	}
 	
-	public static TnccAdapter getTnccAdapter(){
+	public static TncsAdapter getTncsAdapter(){
 		
-		return new TnccAdapter() {
+		return new TncsAdapter() {
 			
 			private long i = new Random().nextInt(100);
 			
@@ -89,38 +89,38 @@ public class Dummy extends AbstractDummy{
 		};
 		
 	}
+	
 
 	public static PaAttribute getAttributeStringVersion() throws ValidationException {
-		UTSNAME systemDescription = new UTSNAME();
-		// Gm take out next line to allow this to run on Windows.
-		// CLibrary.INSTANCE.uname(systemDescription);
-		return PaAttributeFactoryIetf.createStringVersion(new String(systemDescription.release).trim(),null,new String(systemDescription.machine).trim());
-	}
+        UTSNAME systemDescription = new UTSNAME();
+        // CLibrary.INSTANCE.uname(systemDescription); Gm
+        return PaAttributeFactoryIetf.createStringVersion(new String(systemDescription.release).trim(),null,new String(systemDescription.machine).trim());
+    }
 
-	public static PaAttribute getAttributeNumericVersion() throws NumberFormatException, ValidationException, PatternNotFoundException {
-		UTSNAME systemDescription = new UTSNAME();
-		// Gm take out next line to allow this to run on Windows.
-		// CLibrary.INSTANCE.uname(systemDescription);
-		String release = new String(systemDescription.release).trim();
-		Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)-(\\d+)");
+    public static PaAttribute getAttributeNumericVersion() throws NumberFormatException, ValidationException, PatternNotFoundException {
+        UTSNAME systemDescription = new UTSNAME();
+        // CLibrary.INSTANCE.uname(systemDescription);  Gm
+        String release = new String(systemDescription.release).trim();
+        // Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)-(\\d+)");
+        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
 		Matcher m = p.matcher(release);
-		if(m.find()){
-			long majorVersion = Long.parseLong(m.group(1));
-			long minorVersion = Long.parseLong(m.group(2));
-			long buildVersion = Long.parseLong(m.group(3));
-			int servicePackVersion =  Integer.parseInt(m.group(4));
+        if(m.find()){
+            long majorVersion = Long.parseLong(m.group(1));
+            long minorVersion = Long.parseLong(m.group(2));
+            long buildVersion = Long.parseLong(m.group(3));
+            // int servicePackVersion =  Integer.parseInt(m.group(4));
+            int servicePackVersion = 0;
 			int servicePackVersionMinor = 0;
-			return PaAttributeFactoryIetf.createNumericVersion(majorVersion,minorVersion,buildVersion,servicePackVersion, servicePackVersionMinor);
-		}else{
-			throw new PatternNotFoundException("Version pattern " + p.toString() +" was not found.", release, p.toString());
-		}
-	}
+            return PaAttributeFactoryIetf.createNumericVersion(majorVersion,minorVersion,buildVersion,servicePackVersion, servicePackVersionMinor);
+        }else{
+            throw new PatternNotFoundException("Version pattern " + p.toString() +" was not found.", release, p.toString());
+        }
+    }
 
-	public static PaAttribute getAttributeProductInformation() throws ValidationException {
-		UTSNAME systemDescription = new UTSNAME();
-		// Gm take out next line to allow this to run on Windows.
-		// CLibrary.INSTANCE.uname(systemDescription);
-		// RFC 5792 Vendor ID unknown = 0 => Product ID  = 0
-		return PaAttributeFactoryIetf.createProductInformation(0,0, new String(systemDescription.version).trim());
-	}
+    public static PaAttribute getAttributeProductInformation() throws ValidationException {
+        UTSNAME systemDescription = new UTSNAME();
+        // CLibrary.INSTANCE.uname(systemDescription); Gm
+        // RFC 5792 Vendor ID unknown = 0 => Product ID  = 0
+        return PaAttributeFactoryIetf.createProductInformation(0,0, new String(systemDescription.version).trim());
+    }
 }
